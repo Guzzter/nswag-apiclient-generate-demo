@@ -1,0 +1,30 @@
+{
+  "name": "nswag-apiclient-generate-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+	"scripts": {
+		"generate-client:server-app": "start-server-and-test generate-client:server-app:serve http-get://localhost:5000/swagger/v1/swagger.json generate-client:server-app:generate-typescript generate-client:server-app:generate-csharp",
+    "generate-client:server-app:serve": "cross-env ASPNETCORE_URLS=http://*:5000 ASPNETCORE_ENVIRONMENT=Development dotnet run --project src/server-app/API --no-launch-profile",
+    "generate-client:server-app:generate-typescript": "dotnet run --project src/server-app/APIClientGenerator http://localhost:5000/swagger/v1/swagger.json src/client-app/src/clients.ts TypeScript",
+    "generate-client:server-app:generate-csharp": "dotnet run --project src/server-app/ApiClientGenerator http://localhost:5000/swagger/v1/swagger.json clients.cs CSharp",
+		"postinstall": "npm run install:client-app && npm run install:server-app",
+    "install:client-app": "cd src/client-app && npm install",
+    "install:server-app": "cd src/server-app/API && dotnet restore",
+    "build": "npm run build:client-app && npm run build:server-app",
+    "build:client-app": "cd src/client-app && npm run build",
+    "postbuild:client-app": "cpx \"src/client-app/build/**/*.*\" \"src/server-app/API/wwwroot/\"",
+    "build:server-app": "cd src/server-app/API && dotnet build --configuration release",
+    "start": "run-p start:client-app start:server-app",
+    "start:client-app": "cd src/client-app && npm start",
+    "start:server-app": "cross-env ASPNETCORE_URLS=http://*:5000 ASPNETCORE_ENVIRONMENT=Development dotnet watch --project src/server-app/API run --no-launch-profile"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cpx": "^1.5.0",
+    "cross-env": "^7.0.3",
+    "npm-run-all": "^4.1.5",
+    "start-server-and-test": "^1.14.0"
+  }
+}
